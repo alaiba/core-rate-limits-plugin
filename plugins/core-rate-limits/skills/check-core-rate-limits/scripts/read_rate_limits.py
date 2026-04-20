@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read Codex account rate limits via the local app-server JSON-RPC API."""
+"""Read Codex ChatGPT account rate limits via the local app-server JSON-RPC API."""
 
 from __future__ import annotations
 
@@ -102,19 +102,33 @@ def build_report(
     snapshot = rate_limits.get("rateLimits") or {}
     credits = snapshot.get("credits") or {}
 
-    primary = derive_window_data("Primary", snapshot.get("primary"), use_utc)
-    secondary = derive_window_data("Secondary", snapshot.get("secondary"), use_utc)
-
     return {
         "account": account,
         "limit_id": snapshot.get("limitId"),
         "limit_name": snapshot.get("limitName"),
         "plan_type": snapshot.get("planType") or (account or {}).get("planType"),
+        "rate_limit_reached_type": snapshot.get("rateLimitReachedType"),
         "credits": credits,
-        "primary": primary,
-        "secondary": secondary,
+        "primary": derive_window_data("Primary", snapshot.get("primary"), use_utc),
+        "secondary": derive_window_data("Secondary", snapshot.get("secondary"), use_utc),
         "raw": rate_limits,
     }
+
+
+def describe_rpc_error(method: str, error: Any) -> str:
+    message = str(error)
+    if method == "account/read" or "authentication required" in message.lower():
+        return (
+            f"{method} failed: {error}. "
+            "Sign in to ChatGPT with `codex login` and retry."
+        )
+    if method == "account/rateLimits/read":
+        return (
+            f"{method} failed: {error}. "
+            "This Codex build may not expose ChatGPT subscription limits, "
+            "or the current account may not have access."
+        )
+    return f"{method} failed: {error}"
 
 
 def call_app_server(timeout: float) -> tuple[dict[str, Any] | None, dict[str, Any]]:
@@ -208,15 +222,24 @@ def call_app_server(timeout: float) -> tuple[dict[str, Any] | None, dict[str, An
             details = ""
             if stderr_lines:
                 details = f" stderr: {stderr_lines[-1]}"
-            fail(f"timed out waiting for app-server responses.{details}")
+            fail(
+                "timed out waiting for app-server responses. "
+                "Check that Codex is installed and logged in, then retry."
+                f"{details}"
+            )
 
         account_response = responses[2]
         rate_limit_response = responses[3]
 
         if "error" in account_response:
-            fail(f"account/read failed: {account_response['error']}")
+            fail(describe_rpc_error("account/read", account_response["error"]))
         if "error" in rate_limit_response:
-            fail(f"account/rateLimits/read failed: {rate_limit_response['error']}")
+            fail(
+                describe_rpc_error(
+                    "account/rateLimits/read",
+                    rate_limit_response["error"],
+                )
+            )
 
         account = account_response["result"].get("account")
         rate_limits = rate_limit_response["result"]
@@ -263,6 +286,10 @@ def print_human(report: dict[str, Any]) -> None:
         unlimited = "yes" if credits.get("unlimited") else "no"
         balance = credits.get("balance") or "n/a"
         print(f"Credits: has={has_credits}, unlimited={unlimited}, balance={balance}")
+
+    reached_type = report.get("rate_limit_reached_type")
+    if reached_type:
+        print(f"Rate limit state: {reached_type}")
 
 
 def main() -> None:

@@ -26,12 +26,45 @@ Compare with the moved oracle:
 python3 devel/codex-rate-limits.py --json --utc
 ```
 
+Compare the packaged helper and oracle together:
+
+```bash
+python3 - <<'PY'
+import json
+import subprocess
+
+plugin = subprocess.check_output(
+    [
+        "python3",
+        "plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py",
+        "--json",
+        "--utc",
+    ],
+    text=True,
+)
+oracle = subprocess.check_output(
+    ["python3", "devel/codex-rate-limits.py", "--json", "--utc"],
+    text=True,
+)
+print(json.loads(plugin)["primary"])
+print(json.loads(oracle)["primary"])
+PY
+```
+
 Syntax-check both scripts:
 
 ```bash
 python3 -m py_compile \
   devel/codex-rate-limits.py \
   plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py
+```
+
+Exercise one unsupported path with no auth:
+
+```bash
+tmpdir="$(mktemp -d)"
+CODEX_HOME="$tmpdir" \
+python3 plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py --json --utc
 ```
 
 ## GitHub Setup
