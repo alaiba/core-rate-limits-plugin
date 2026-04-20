@@ -1,14 +1,14 @@
 {
-  "name": "core-rate-limits-local",
+  "name": "codex-rate-limits-local",
   "interface": {
-    "displayName": "Core Rate Limits Local"
+    "displayName": "Codex Rate Limits Local"
   },
   "plugins": [
     {
-      "name": "core-rate-limits",
+      "name": "codex-rate-limits",
       "source": {
         "source": "local",
-        "path": "./plugins/core-rate-limits"
+        "path": "./plugins/codex-rate-limits"
       },
       "policy": {
         "installation": "AVAILABLE",

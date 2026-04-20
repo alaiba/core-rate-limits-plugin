@@ -1,7 +1,6 @@
 # Codex Rate-Limit Skill Plugin Plan
 
-> Historical note: this planning document was moved from Arcogine into the standalone `core-rate-limits-plugin` repository on 2026-04-20. Original file-and-line anchors are preserved for context.
-> Standalone mapping: historical `plugins/codex-rate-limits/...` references correspond to `plugins/core-rate-limits/...`, and historical `check-codex-rate-limits` references correspond to `check-core-rate-limits`.
+> Historical note: this planning document was moved from Arcogine into the standalone `codex-rate-limits-plugin` repository on 2026-04-20. Original file-and-line anchors are preserved for context.
 
 > **Date:** 2026-04-20
 > **Scope:** Design a repo-local Codex skill, packaged as a local plugin, that reports the `5h` and `Weekly` subscription rate limits with the smallest practical runtime surface, and document the preferred cross-project distribution model.
@@ -93,15 +92,15 @@ Acceptance criteria:
 
 Implementation Status (2026-04-20):
 - Completed tasks:
-  - Added the bundled helper at `plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py`.
-  - Added the canonical packaged skill at `plugins/core-rate-limits/skills/check-core-rate-limits/SKILL.md`.
-  - Added the protocol and normalization reference at `plugins/core-rate-limits/skills/check-core-rate-limits/references/app-server-contract.md`.
+  - Added the bundled helper at `plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py`.
+  - Added the canonical packaged skill at `plugins/codex-rate-limits/skills/check-codex-rate-limits/SKILL.md`.
+  - Added the protocol and normalization reference at `plugins/codex-rate-limits/skills/check-codex-rate-limits/references/app-server-contract.md`.
 - Build/runtime fixes applied:
   - Hardened JSON-RPC failures with explicit next-step messaging for missing login, unsupported `account/rateLimits/read`, and app-server timeout cases.
   - Preserved the standalone developer utility as a validation oracle only; the packaged helper remains self-contained.
 - Validation completed:
-  - `python3 -m py_compile devel/codex-rate-limits.py plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py`
-  - `python3 plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py --json --utc`
+  - `python3 -m py_compile devel/codex-rate-limits.py plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py`
+  - `python3 plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py --json --utc`
   - `python3 devel/codex-rate-limits.py --json --utc`
 
 ---
@@ -129,16 +128,16 @@ Acceptance criteria:
 
 Implementation Status (2026-04-20):
 - Completed tasks:
-  - Added `plugins/core-rate-limits/.codex-plugin/plugin.json` as the standalone plugin manifest.
-  - Added `.agents/plugins/marketplace.json` with a repo-local plugin entry for `./plugins/core-rate-limits`.
+  - Added `plugins/codex-rate-limits/.codex-plugin/plugin.json` as the standalone plugin manifest.
+  - Added `.agents/plugins/marketplace.json` with a repo-local plugin entry for `./plugins/codex-rate-limits`.
   - Kept the canonical skill only inside the plugin package; no duplicate skill tree was introduced elsewhere.
   - Kept the packaged runtime surface to the single helper from Phase 1.
 - Build/runtime fixes applied:
   - Validated repo-local marketplace installation from the standalone repo root with a disposable `CODEX_HOME`.
 - Validation completed:
-  - `python3 -m json.tool plugins/core-rate-limits/.codex-plugin/plugin.json`
+  - `python3 -m json.tool plugins/codex-rate-limits/.codex-plugin/plugin.json`
   - `python3 -m json.tool .agents/plugins/marketplace.json`
-  - `CODEX_HOME=<temp> codex plugin marketplace add /workspaces/core-rate-limits-plugin`
+  - `CODEX_HOME=<temp> codex plugin marketplace add /workspaces/codex-rate-limits-plugin`
 
 ---
 
@@ -165,19 +164,19 @@ Acceptance criteria:
 Implementation Status (2026-04-20):
 - Completed tasks:
   - Installed the standalone repo-local marketplace into a disposable `CODEX_HOME`.
-  - Validated an explicit prompt in a fresh Codex session, which loaded `check-core-rate-limits` and executed the packaged helper.
+  - Validated an explicit prompt in a fresh Codex session, which loaded `check-codex-rate-limits` and executed the packaged helper.
   - Compared helper output against `devel/codex-rate-limits.py` and validated unsupported-path behavior with an empty `CODEX_HOME`.
 - Build/runtime fixes applied:
   - Tightened the skill description and failure guidance for the standalone repo after migration.
   - Recorded the standalone validation-path deviation because Arcogine's `make quality` target does not exist in this extracted repository.
 - Validation completed:
-  - `python3 -m py_compile devel/codex-rate-limits.py plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py`
+  - `python3 -m py_compile devel/codex-rate-limits.py plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py`
   - concurrent helper/oracle comparison with reset and window-size matching and percentage drift within one point
-  - `CODEX_HOME=<temp> python3 plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py --json --utc` without auth, confirming actionable login guidance
-  - `CODEX_HOME=<temp> codex plugin marketplace add /workspaces/core-rate-limits-plugin`
+  - `CODEX_HOME=<temp> python3 plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py --json --utc` without auth, confirming actionable login guidance
+  - `CODEX_HOME=<temp> codex plugin marketplace add /workspaces/codex-rate-limits-plugin`
   - `CODEX_HOME=<temp> codex exec ... "check my 5h and weekly rate limits"`
 - Validation remaining before this phase can be marked fully done:
-  - Re-run the natural-language prompt validation in a fresh session and confirm phrases like `do I have Codex room left today?` resolve through `check-core-rate-limits` rather than a generic workspace search path.
+  - Re-run the natural-language prompt validation in a fresh session and confirm phrases like `do I have Codex room left today?` resolve through `check-codex-rate-limits` rather than a generic workspace search path.
   - Decide whether to add a standalone local `make quality` wrapper or keep the extracted repo on explicit repo-local validation commands plus CI.
 
 ---
@@ -209,7 +208,7 @@ Implementation Status (2026-04-20):
   - Documented home-local installation as the default team rollout path for reuse outside this repository.
   - Documented when multi-plugin repositories are acceptable and when they are not.
 - Build/runtime fixes applied:
-  - Clarified that the installable artifact remains `plugins/core-rate-limits/`, while the repo-local marketplace file is for development convenience.
+  - Clarified that the installable artifact remains `plugins/codex-rate-limits/`, while the repo-local marketplace file is for development convenience.
 
 ---
 

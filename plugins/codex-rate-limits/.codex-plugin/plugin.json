@@ -1,13 +1,13 @@
 {
-  "name": "core-rate-limits",
+  "name": "codex-rate-limits",
   "version": "0.1.0",
   "description": "Check current Codex ChatGPT subscription rate-limit windows.",
   "author": {
     "name": "alaiba",
     "url": "https://github.com/alaiba"
   },
-  "homepage": "https://github.com/alaiba/core-rate-limits-plugin",
-  "repository": "https://github.com/alaiba/core-rate-limits-plugin",
+  "homepage": "https://github.com/alaiba/codex-rate-limits-plugin",
+  "repository": "https://github.com/alaiba/codex-rate-limits-plugin",
   "license": "MIT",
   "keywords": [
     "codex",
@@ -16,7 +16,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Core Rate Limits",
+    "displayName": "Codex Rate Limits",
     "shortDescription": "Reads current 5h and Weekly Codex usage windows.",
     "longDescription": "Uses the local codex app-server JSON-RPC API to report current ChatGPT subscription rate limits without UI scraping.",
     "developerName": "Local",

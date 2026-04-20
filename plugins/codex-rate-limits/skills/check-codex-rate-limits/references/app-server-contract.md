@@ -7,7 +7,7 @@ This skill uses the local Codex app-server over stdio and normalizes the subscri
 Send these requests in order:
 
 1. `initialize`
-   - `clientInfo.name`: `core-rate-limits`
+   - `clientInfo.name`: `codex-rate-limits`
    - `capabilities.experimentalApi`: `true`
 2. `account/read`
    - `refreshToken: true`

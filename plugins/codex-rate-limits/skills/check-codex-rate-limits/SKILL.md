@@ -1,9 +1,9 @@
 ---
-name: check-core-rate-limits
+name: check-codex-rate-limits
 description: Report the current Codex ChatGPT subscription rate-limit windows, including “do I have room left today?” requests, using the local Codex app-server instead of guessing.
 ---
 
-# Check Core Rate Limits
+# Check Codex Rate Limits
 
 Use this skill when the user asks about their current Codex ChatGPT subscription room, including:
 

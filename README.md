@@ -1,13 +1,13 @@
-# Core Rate Limits Plugin
+# Codex Rate Limits Plugin
 
-`core-rate-limits-plugin` is a standalone GitHub-ready home for the `core-rate-limits` Codex plugin.
+`codex-rate-limits-plugin` is a standalone GitHub-ready home for the `codex-rate-limits` Codex plugin.
 
 The plugin reads the current Codex ChatGPT subscription rate-limit windows from the local `codex app-server` JSON-RPC API and formats the `5h` and `Weekly` windows for quick answers.
 
 ## Layout
 
-- `plugins/core-rate-limits/` contains the installable plugin package.
-- `plugins/core-rate-limits/skills/check-core-rate-limits/` contains the skill, runtime helper, and protocol notes.
+- `plugins/codex-rate-limits/` contains the installable plugin package.
+- `plugins/codex-rate-limits/skills/check-codex-rate-limits/` contains the skill, runtime helper, and protocol notes.
 - `devel/codex-rate-limits.py` is the original developer oracle moved out of Arcogine for comparison and debugging.
 - `docs/codex-rate-limits-skill-plugin-plan.md` is the historical extraction plan carried over with the source material.
 - `.agents/plugins/marketplace.json` provides a repo-local marketplace entry for development.
@@ -17,7 +17,7 @@ The plugin reads the current Codex ChatGPT subscription rate-limit windows from 
 Run the helper directly:
 
 ```bash
-python3 plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py --utc
+python3 plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py --utc
 ```
 
 Compare with the moved oracle:
@@ -36,7 +36,7 @@ import subprocess
 plugin = subprocess.check_output(
     [
         "python3",
-        "plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py",
+        "plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py",
         "--json",
         "--utc",
     ],
@@ -56,7 +56,7 @@ Syntax-check both scripts:
 ```bash
 python3 -m py_compile \
   devel/codex-rate-limits.py \
-  plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py
+  plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py
 ```
 
 Exercise one unsupported path with no auth:
@@ -64,11 +64,11 @@ Exercise one unsupported path with no auth:
 ```bash
 tmpdir="$(mktemp -d)"
 CODEX_HOME="$tmpdir" \
-python3 plugins/core-rate-limits/skills/check-core-rate-limits/scripts/read_rate_limits.py --json --utc
+python3 plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py --json --utc
 ```
 
 ## GitHub Setup
 
-1. Create a new GitHub repository named `core-rate-limits-plugin`.
+1. Create a new GitHub repository named `codex-rate-limits-plugin`.
 2. Push this directory as that repository's root.
-3. Update plugin metadata in `plugins/core-rate-limits/.codex-plugin/plugin.json` if you want repo-specific URLs or publisher details.
+3. Update plugin metadata in `plugins/codex-rate-limits/.codex-plugin/plugin.json` if you want repo-specific URLs or publisher details.

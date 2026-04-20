@@ -159,8 +159,8 @@ def call_app_server(timeout: float) -> tuple[dict[str, Any] | None, dict[str, An
             "method": "initialize",
             "params": {
                 "clientInfo": {
-                    "name": "core-rate-limits",
-                    "title": "Core Rate Limits",
+                    "name": "codex-rate-limits",
+                    "title": "Codex Rate Limits",
                     "version": "1",
                 },
                 "capabilities": {
