@@ -1,0 +1,20 @@
+{
+  "name": "core-rate-limits-local",
+  "interface": {
+    "displayName": "Core Rate Limits Local"
+  },
+  "plugins": [
+    {
+      "name": "core-rate-limits",
+      "source": {
+        "source": "local",
+        "path": "./plugins/core-rate-limits"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
