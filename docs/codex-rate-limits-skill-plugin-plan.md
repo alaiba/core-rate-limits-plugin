@@ -141,16 +141,17 @@ Implementation Status (2026-04-20):
 
 ---
 
-### Phase 3. Validate Live Behavior And Repo Fit [Implemented 2026-04-20; natural-language routing validation pending]
+### Phase 3. Validate Live Behavior And Repo Fit [In Progress 2026-04-20; fresh-session prompt validation blocked by Codex account limit]
 
 Objective: Prove that the packaged skill works in a live Codex session and stays aligned with repo validation expectations.
 
 Planned work:
 
 1. [Done 2026-04-20] Install the plugin from the repo-local marketplace, start a fresh Codex session, and compare the plugin-driven answer with `devel/codex-rate-limits.py --json --utc` on the same machine to verify percentages, reset times, plan type, and failure handling. `<devel/codex-rate-limits.py:267-280>`
-2. [Partially validated 2026-04-20] Exercise at least two live prompts, one explicit and one natural-language, such as “check my 5h and weekly rate limits” and “do I have Codex room left today?”, and verify that the skill routes through the packaged helper and returns the subscription windows rather than API RPM/TPM headers. `<devel/codex-rate-limits.py:60-73>` `<devel/codex-rate-limits.py:229-257>`
-3. [Deviation 2026-04-20] Run `make quality`, plus any lightweight JSON or markdown checks added for the plugin packaging work, before calling the implementation complete. `<docs/TESTING.md:3-18>` `<CONTRIBUTING.md:88-97>`
-   Standalone migration note (2026-04-20): the extracted repo does not carry Arcogine's `make quality` surface. Validation was executed with repo-local Python checks, helper-oracle comparison, marketplace install, and the existing GitHub Actions `python-smoke` workflow instead.
+2. [Blocked 2026-04-20] Exercise at least two live prompts, one explicit and one natural-language, such as “check my 5h and weekly rate limits” and “do I have Codex room left today?”, and verify that the skill routes through the packaged helper and returns the subscription windows rather than API RPM/TPM headers. `<devel/codex-rate-limits.py:60-73>` `<devel/codex-rate-limits.py:229-257>`
+   Blocker note (2026-04-20): repo-local marketplace installation into an isolated `CODEX_HOME` succeeded, but the fresh-session `codex exec` run failed before skill routing with `You've hit your usage limit. To get more access now, send a request to your admin or try again at Apr 21st, 2026 1:46 AM.` Re-run the explicit and natural-language prompts after that account reset window.
+3. [Done 2026-04-20] Run `make quality`, plus any lightweight JSON or markdown checks added for the plugin packaging work, before calling the implementation complete. `<docs/TESTING.md:3-18>` `<CONTRIBUTING.md:88-97>`
+   Resolution note (2026-04-20): added standalone repo `make quality` and `make quality-full` targets, documented them in `docs/TESTING.md` and `CONTRIBUTING.md`, and updated CI to call `make quality` so the extracted repo now has standard validation entrypoints again.
 
 Files expected:
 - `devel/codex-rate-limits.py` (existing; validation oracle at `<devel/codex-rate-limits.py:267-280>`)
@@ -163,21 +164,22 @@ Acceptance criteria:
 
 Implementation Status (2026-04-20):
 - Completed tasks:
-  - Installed the standalone repo-local marketplace into a disposable `CODEX_HOME`.
-  - Validated an explicit prompt in a fresh Codex session, which loaded `check-codex-rate-limits` and executed the packaged helper.
-  - Compared helper output against `devel/codex-rate-limits.py` and validated unsupported-path behavior with an empty `CODEX_HOME`.
+  - Installed the standalone repo-local marketplace into disposable `CODEX_HOME` directories for both authenticated and unauthenticated validation paths.
+  - Compared helper output against `devel/codex-rate-limits.py` with matching `plan_type`, `limit_id`, window names, remaining percentages, and reset timestamps.
+  - Added standalone `make quality` and `make quality-full` entrypoints plus the extracted repo's `docs/TESTING.md` and `CONTRIBUTING.md`.
+  - Updated the GitHub Actions `python-smoke` job to run `make quality`.
+  - Validated unsupported-path behavior with an empty `CODEX_HOME` and repo-local marketplace installation through `make quality-full`.
 - Build/runtime fixes applied:
-  - Tightened the skill description and failure guidance for the standalone repo after migration.
-  - Recorded the standalone validation-path deviation because Arcogine's `make quality` target does not exist in this extracted repository.
+  - Restored standard repo validation entrypoints for the standalone extraction instead of relying on ad hoc command lists.
+  - Kept the live prompt-routing validation separate from CI because it depends on an authenticated Codex session with available usage.
 - Validation completed:
-  - `python3 -m py_compile devel/codex-rate-limits.py plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py`
-  - concurrent helper/oracle comparison with reset and window-size matching and percentage drift within one point
-  - `CODEX_HOME=<temp> python3 plugins/codex-rate-limits/skills/check-codex-rate-limits/scripts/read_rate_limits.py --json --utc` without auth, confirming actionable login guidance
+  - `make quality`
+  - `make quality-full`
+  - helper/oracle exact-match comparison for `plan_type`, `limit_id`, both window names, both reset timestamps, and both remaining percentages
   - `CODEX_HOME=<temp> codex plugin marketplace add /workspaces/codex-rate-limits-plugin`
-  - `CODEX_HOME=<temp> codex exec ... "check my 5h and weekly rate limits"`
 - Validation remaining before this phase can be marked fully done:
-  - Re-run the natural-language prompt validation in a fresh session and confirm phrases like `do I have Codex room left today?` resolve through `check-codex-rate-limits` rather than a generic workspace search path.
-  - Decide whether to add a standalone local `make quality` wrapper or keep the extracted repo on explicit repo-local validation commands plus CI.
+  - Re-run fresh-session `codex exec` prompts after the Codex account limit resets at `Apr 21st, 2026 1:46 AM` because the isolated-session validation attempt failed before skill routing.
+  - Confirm both `check my 5h and weekly rate limits` and `do I have Codex room left today?` resolve through `check-codex-rate-limits` and return the `5h` / `Weekly` subscription windows rather than API RPM/TPM data.
 
 ---
 
