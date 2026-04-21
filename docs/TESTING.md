@@ -1,24 +1,24 @@
 # Testing
 
-## Standard quality gates
+## Standard Validation
 
-Use the repo root Python quality runner as the canonical validation entrypoint:
+Use the repo root Python runner as the canonical validation entrypoint:
 
 ```bash
-python3 scripts/quality.py quality
-python3 scripts/quality.py quality-full
+python3 scripts/quality.py ci
+python3 scripts/quality.py local
 ```
 
-`python3 scripts/quality.py quality` runs the deterministic checks that also back CI:
+`python3 scripts/quality.py ci` runs the deterministic checks that also back CI:
 
 - Python syntax compilation for the helper and standalone oracle
 - JSON validation for the plugin manifest and repo-local marketplace entry
 
-`python3 scripts/quality.py quality-full` adds local smoke checks that do not require a signed-in ChatGPT session:
+`python3 scripts/quality.py local` adds local smoke checks that do not require a signed-in ChatGPT session:
 
 - unsupported-path validation with an empty `CODEX_HOME`
 
-The earlier repo-local plugin installation smoke check was removed from the standard quality runner because the current Codex CLI no longer supports `codex plugin marketplace add`. Keep plugin-install validation separate until the current CLI exposes a supported local-plugin install path again.
+The earlier repo-local plugin installation smoke check was removed from the standard local runner because the current Codex CLI no longer supports `codex plugin marketplace add`. Keep plugin-install validation separate until the current CLI exposes a supported local-plugin install path again.
 
 ## Live authenticated validation
 

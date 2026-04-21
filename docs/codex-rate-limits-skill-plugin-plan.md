@@ -37,7 +37,7 @@ The repo already contains a working utility that maps a `300` minute window to `
 
 ### 3.2 Current validation and workflow conventions
 
-The project now treats `python3 scripts/quality.py quality` and `python3 scripts/quality.py quality-full` as the canonical quality-gate interface. The contributing guide also expects contributors to run the quality checks before opening a PR. `<docs/TESTING.md:3-18>` `<CONTRIBUTING.md:1-13>`
+The project now treats `python3 scripts/quality.py ci` and `python3 scripts/quality.py local` as the canonical validation interface. The contributing guide also expects contributors to run the CI validation checks before opening a PR. `<docs/TESTING.md:3-18>` `<CONTRIBUTING.md:1-13>`
 
 ### 3.3 Existing utility complexity boundary
 
@@ -150,8 +150,8 @@ Planned work:
 1. [Done 2026-04-20] Install the plugin from the repo-local marketplace, start a fresh Codex session, and compare the plugin-driven answer with `devel/codex-rate-limits.py --json --utc` on the same machine to verify percentages, reset times, plan type, and failure handling. `<devel/codex-rate-limits.py:267-280>`
 2. [Blocked 2026-04-20] Exercise at least two live prompts, one explicit and one natural-language, such as “check my 5h and weekly rate limits” and “do I have Codex room left today?”, and verify that the skill routes through the packaged helper and returns the subscription windows rather than API RPM/TPM headers. `<devel/codex-rate-limits.py:60-73>` `<devel/codex-rate-limits.py:229-257>`
    Blocker note (2026-04-20): repo-local marketplace installation into an isolated `CODEX_HOME` succeeded, but the fresh-session `codex exec` run failed before skill routing with `You've hit your usage limit. To get more access now, send a request to your admin or try again at Apr 21st, 2026 1:46 AM.` Re-run the explicit and natural-language prompts after that account reset window.
-3. [Done 2026-04-20; updated 2026-04-21] Run the documented repo quality entrypoint, plus any lightweight JSON or markdown checks added for the plugin packaging work, before calling the implementation complete. `<docs/TESTING.md:3-18>` `<CONTRIBUTING.md:1-13>`
-   Resolution note (2026-04-21): replaced the Unix-only `make` wrapper with `python3 scripts/quality.py quality` and `python3 scripts/quality.py quality-full`, documented those commands in `docs/TESTING.md` and `CONTRIBUTING.md`, and updated CI to call the Python runner directly.
+3. [Done 2026-04-20; updated 2026-04-21] Run the documented repo validation entrypoint, plus any lightweight JSON or markdown checks added for the plugin packaging work, before calling the implementation complete. `<docs/TESTING.md:3-18>` `<CONTRIBUTING.md:1-13>`
+   Resolution note (2026-04-21): replaced the Unix-only `make` wrapper with `python3 scripts/quality.py ci` and `python3 scripts/quality.py local`, documented those commands in `docs/TESTING.md` and `CONTRIBUTING.md`, and updated CI to call the Python runner directly.
 
 Files expected:
 - `devel/codex-rate-limits.py` (existing; validation oracle at `<devel/codex-rate-limits.py:267-280>`)
@@ -166,16 +166,16 @@ Implementation Status (2026-04-20):
 - Completed tasks:
   - Installed the standalone repo-local marketplace into disposable `CODEX_HOME` directories for both authenticated and unauthenticated validation paths.
   - Compared helper output against `devel/codex-rate-limits.py` with matching `plan_type`, `limit_id`, window names, remaining percentages, and reset timestamps.
-  - Added standalone `python3 scripts/quality.py quality` and `python3 scripts/quality.py quality-full` entrypoints plus the extracted repo's `docs/TESTING.md` and `CONTRIBUTING.md`.
+  - Added standalone `python3 scripts/quality.py ci` and `python3 scripts/quality.py local` entrypoints plus the extracted repo's `docs/TESTING.md` and `CONTRIBUTING.md`.
   - Updated the GitHub Actions `python-smoke` job to run the Python quality runner directly.
-  - Kept unsupported-path validation in `quality-full` and removed the stale plugin-install smoke from the canonical quality runner after the current Codex CLI removed `codex plugin marketplace add`.
+  - Kept unsupported-path validation in `local` and removed the stale plugin-install smoke from the canonical runner after the current Codex CLI removed `codex plugin marketplace add`.
 - Build/runtime fixes applied:
   - Restored standard repo validation entrypoints for the standalone extraction instead of relying on ad hoc command lists.
   - Replaced the Unix-biased `make` wrapper with a cross-platform Python runner.
   - Kept the live prompt-routing validation separate from CI because it depends on an authenticated Codex session with available usage.
 - Validation completed:
-  - `python3 scripts/quality.py quality`
-  - `python3 scripts/quality.py quality-full`
+  - `python3 scripts/quality.py ci`
+  - `python3 scripts/quality.py local`
   - helper/oracle exact-match comparison for `plan_type`, `limit_id`, both window names, both reset timestamps, and both remaining percentages
 - Validation remaining before this phase can be marked fully done:
   - Re-run fresh-session `codex exec` prompts after the Codex account limit resets at `Apr 21st, 2026 1:46 AM` because the isolated-session validation attempt failed before skill routing.
@@ -223,7 +223,7 @@ Implementation Status (2026-04-20):
 4. Compare the live skill answer with both the packaged helper output and the existing developer oracle for percentages, reset times, `limitId`, and `planType`.
 5. Repeat the live test with an indirect prompt to confirm the skill still activates for natural language instead of only for the exact phrase “rate limits”.
 6. Verify the unsupported-path behavior by testing at least one failure mode in a disposable environment, such as missing ChatGPT auth or an older Codex build that does not return `account/rateLimits/read`, and confirm that the skill emits clear next steps rather than stale or guessed values.
-7. Run `python3 scripts/quality.py quality` from the repo root and record any added markdown or JSON validation steps alongside it.
+7. Run `python3 scripts/quality.py ci` from the repo root and record any added markdown or JSON validation steps alongside it.
 8. Review the distribution note and confirm it clearly distinguishes the short-term repo-local validation path from the long-term shared one-plugin-per-repo distribution path.
 
 ---
@@ -248,7 +248,7 @@ Implementation Status (2026-04-20):
 
 - Treat native Windows support as a first-class runtime target for the helper and oracle scripts.
 - Treat plugin installation and marketplace validation as blocked on current Codex CLI discovery/install semantics rather than as a Windows-only gap.
-- Treat the Python quality runner as the canonical cross-platform validation entrypoint.
+- Treat the Python runner as the canonical cross-platform validation entrypoint.
 
 ---
 

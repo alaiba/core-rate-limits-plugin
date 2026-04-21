@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cross-platform quality entrypoints for the codex-rate-limits repo."""
+"""Cross-platform validation entrypoints for the codex-rate-limits repo."""
 
 from __future__ import annotations
 
@@ -30,14 +30,14 @@ MARKETPLACE = REPO_ROOT / ".agents" / "plugins" / "marketplace.json"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run repo quality checks without a platform-specific task runner."
+        description="Run repo validation checks without a platform-specific task runner."
     )
     parser.add_argument(
         "target",
-        choices=("quality", "quality-full"),
+        choices=("ci", "local"),
         nargs="?",
-        default="quality",
-        help="quality: deterministic checks only; quality-full: add local smoke checks",
+        default="ci",
+        help="ci: deterministic checks only; local: add local smoke checks",
     )
     return parser.parse_args()
 
@@ -107,7 +107,7 @@ def main() -> None:
     run_check("python-compile", compile_python)
     run_check("json-validate", validate_json)
 
-    if args.target == "quality-full":
+    if args.target == "local":
         run_check("no-auth-smoke", no_auth_smoke)
 
 
